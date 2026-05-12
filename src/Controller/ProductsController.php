@@ -15,14 +15,29 @@ class ProductsController extends AppController
      *
      * @return \Cake\Http\Response|null|void Renders view
      */
-    public function index()
-    {
-        $query = $this->Products->find()
-            ->contain(['Categories', 'Users']);
-        $products = $this->paginate($query);
+public function index()
+{
+    $query = $this->Products->find('active')
+        ->contain(['Categories', 'Users', 'Tags']);
 
-        $this->set(compact('products'));
+    if ($cat = $this->request->getQuery('category_id')) {
+        $query->find('byCategory', categoryId: (int)$cat);
     }
+
+    if ($this->request->getQuery('low_stock')) {
+        $query->find('lowStock');
+    }
+
+    if ($q = $this->request->getQuery('q')) {
+        $query->where(['Products.name LIKE' => "%{$q}%"]);
+    }
+
+    $products = $this->paginate($query, [
+        'sortableFields' => ['name', 'price', 'stock_quantity'],
+    ]);
+
+    $this->set(compact('products'));
+}
 
     /**
      * View method

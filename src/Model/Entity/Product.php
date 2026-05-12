@@ -54,4 +54,22 @@ class Product extends Entity
         'stock_logs' => true,
         'tags' => true,
     ];
+
+    protected array $_virtual = ['price_formatted', 'status_label'];
+
+    protected function _getPriceFormatted(): string
+    {
+        return 'R$ '. number_format((float)$this->price ?? 0, 2, ',', '.');
+    }
+
+    protected function _getStatusLabel(): string
+    {
+        if ($this->stock_quantity <= 0) {
+            return 'Esgotado';
+        }
+        if ($this->stock_quantity <= $this->min_stock) {
+            return 'Estoque baixo';
+        }
+        return 'Disponível';
+    }
 }

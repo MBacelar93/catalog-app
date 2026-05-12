@@ -33,10 +33,10 @@
                     <td><?= $product->hasValue('user') ? $this->Html->link($product->user->name, ['controller' => 'Users', 'action' => 'view', $product->user->id]) : '' ?></td>
                     <td><?= h($product->name) ?></td>
                     <td><?= h($product->slug) ?></td>
-                    <td><?= $this->Number->format($product->price) ?></td>
+                    <td><?= $product->price_formatted ?></td>
                     <td><?= $this->Number->format($product->stock_quantity) ?></td>
                     <td><?= $this->Number->format($product->min_stock) ?></td>
-                    <td><?= h($product->is_active) ?></td>
+                    <td><?= $product->status_label ?></td>
                     <td><?= h($product->created) ?></td>
                     <td><?= h($product->modified) ?></td>
                     <td class="actions">
