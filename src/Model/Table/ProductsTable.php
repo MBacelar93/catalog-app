@@ -50,6 +50,8 @@ class ProductsTable extends Table
 
         $this->addBehavior('Timestamp');
 
+        $this->addBehavior('Sluggable');
+
         $this->belongsTo('Categories', [
             'foreignKey' => 'category_id',
             'joinType' => 'INNER',
@@ -91,11 +93,10 @@ class ProductsTable extends Table
             ->notEmptyString('name');
 
         $validator
+
             ->scalar('slug')
             ->maxLength('slug', 255)
-            ->requirePresence('slug', 'create')
-            ->notEmptyString('slug')
-            ->add('slug', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
+            ->allowEmptyString('slug');
 
         $validator
             ->scalar('description')
@@ -136,4 +137,27 @@ class ProductsTable extends Table
 
         return $rules;
     }
+
+    public function findActive(SelectQuery $query) : SelectQuery
+    {
+        return $query->where(['Products.is_active' => true]);
+    }
+
+    public function findInStock(SelectQuery $query) : SelectQuery
+    {
+        return $query->where(['Products.stock_quantity >' => 0]);
+    }
+
+    public function findLowStock(SelectQuery $query) : SelectQuery
+    {
+        return $query->where([
+            'Products.stock_quantity <=' => $query->identifier('Products.min_stock'),
+            'Products.stock_quantity >' => 0,
+        ]);
+    }
+
+public function findByCategory(SelectQuery $query, int $categoryId): SelectQuery
+{
+    return $query->where(['Products.category_id' => $categoryId]);
+}
 }
